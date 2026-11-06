@@ -1,7 +1,11 @@
 import streamlit as st
-import requests
 
-API_URL = "http://127.0.0.1:8000/ask"
+from llm.retrieve_context import get_context
+from llm.generate_sql import generate_sql
+from llm.generate_answer import generate_answer
+
+from services.sql_validator import validate_sql
+from services.sql_executor import execute_sql
 
 st.set_page_config(
     page_title="Retail Analytics Assistant",
@@ -10,9 +14,6 @@ st.set_page_config(
 )
 
 st.title("📊 Retail Analytics Assistant")
-st.caption(
-    "Ask questions about your retail sales data"
-)
 
 question = st.text_input(
     "Ask a Question",
@@ -21,79 +22,45 @@ question = st.text_input(
 
 if st.button("Generate Answer"):
 
-    if not question.strip():
-
-        st.warning(
-            "Please enter a question."
-        )
-
-    else:
+    if question.strip():
 
         try:
 
-            with st.spinner(
-                "Generating SQL and analyzing data..."
-            ):
+            with st.spinner("Analyzing data..."):
 
-                response = requests.post(
-                    API_URL,
-                    params={"question": question}
+                context = get_context(question)
+
+                sql = generate_sql(
+                    question,
+                    context
                 )
 
-                result = response.json()
+                validate_sql(sql)
 
-            col1, col2 = st.columns([2, 1])
+                result_df = execute_sql(sql)
 
-            with col1:
-
-                st.subheader("📝 Answer")
-
-                st.success(
-                    result.get(
-                        "answer",
-                        "No answer generated"
-                    )
+                answer = generate_answer(
+                    question,
+                    result_df
                 )
 
-            with col2:
-
-                st.subheader("📊 Statistics")
-
-                st.metric(
-                    "Rows Returned",
-                    result.get(
-                        "rows",
-                        0
-                    )
-                )
-
-            st.divider()
+            st.subheader("📝 Answer")
+            st.success(answer)
 
             st.subheader("🛠 Generated SQL")
+            st.code(sql, language="sql")
 
-            st.code(
-                result.get(
-                    "sql",
-                    ""
-                ),
-                language="sql"
+            st.subheader("📋 Query Result")
+            st.dataframe(
+                result_df,
+                use_container_width=True
             )
 
-            st.divider()
-
-            if "data" in result:
-
-                st.subheader(
-                    "📋 Query Result"
-                )
-
-                st.dataframe(
-                    result["data"],
-                    use_container_width=True
-                )
+            st.metric(
+                "Rows Returned",
+                len(result_df)
+            )
 
         except Exception as e:
 
-            st.error(
-                f"Error: {str(e)}"
-            )
+            st.error(str(e))
