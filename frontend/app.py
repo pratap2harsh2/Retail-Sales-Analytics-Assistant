@@ -27,7 +27,11 @@ from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
 
 if not Path("./qdrant_db").exists():
-    build_vector_store()
+
+    try:
+        build_vector_store()
+    except Exception as e:
+        print(e)
 
 
 st.set_page_config(
