@@ -26,13 +26,23 @@ from llm.generate_answer import generate_answer
 from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
 
-if not Path("./qdrant_db").exists():
+from pathlib import Path
+import traceback
 
+BASE_DIR = Path(__file__).resolve().parent
+QDRANT_PATH = BASE_DIR / "qdrant_db"
+
+if not QDRANT_PATH.exists():
     try:
+        st.info("Building Qdrant Vector Database...")
         build_vector_store()
+        if QDRANT_PATH.exists():
+            st.success("Qdrant database created successfully!")
+        else:
+            st.error("Qdrant database was not created.")
     except Exception as e:
-        print(e)
-
+        st.error(f"Vector DB initialization failed: {e}")
+        st.code(traceback.format_exc())
 
 st.set_page_config(
     page_title="Retail Analytics Assistant",
