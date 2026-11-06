@@ -26,32 +26,9 @@ from llm.generate_answer import generate_answer
 from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
 
-@st.cache_resource
-def initialize_qdrant():
+if not Path("./qdrant_db").exists():
+    build_vector_store()
 
-    try:
-
-        client = QdrantClient(
-            path="./qdrant_db"
-        )
-
-        collections = client.get_collections()
-
-        names = [
-            c.name
-            for c in collections.collections
-        ]
-
-        if "retail_metadata" not in names:
-
-            build_vector_store()
-
-    except Exception:
-
-        build_vector_store()
-
-
-initialize_qdrant()
 
 st.set_page_config(
     page_title="Retail Analytics Assistant",
