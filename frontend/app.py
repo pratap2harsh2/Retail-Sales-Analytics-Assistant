@@ -4,14 +4,9 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
-import streamlit as st
+from vector_store.build_vector_db import build_vector_store
 
-from llm.retrieve_context import get_context
-from llm.generate_sql import generate_sql
-from llm.generate_answer import generate_answer
-
-from services.sql_validator import validate_sql
-from services.sql_executor import execute_sql
+from qdrant_client import QdrantClient
 
 import streamlit as st
 
@@ -21,6 +16,42 @@ from llm.generate_answer import generate_answer
 
 from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
+
+import streamlit as st
+
+from llm.retrieve_context import get_context
+from llm.generate_sql import generate_sql
+from llm.generate_answer import generate_answer
+
+from services.sql_validator import validate_sql
+from services.sql_executor import execute_sql
+
+@st.cache_resource
+def initialize_qdrant():
+
+    try:
+
+        client = QdrantClient(
+            path="./qdrant_db"
+        )
+
+        collections = client.get_collections()
+
+        names = [
+            c.name
+            for c in collections.collections
+        ]
+
+        if "retail_metadata" not in names:
+
+            build_vector_store()
+
+    except Exception:
+
+        build_vector_store()
+
+
+initialize_qdrant()
 
 st.set_page_config(
     page_title="Retail Analytics Assistant",

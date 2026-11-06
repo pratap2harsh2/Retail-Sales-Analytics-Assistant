@@ -1,133 +1,129 @@
-import os
-import pandas as pd
-import cohere
+def build_vector_store():
 
-from dotenv import load_dotenv
-from qdrant_client import QdrantClient
-from qdrant_client.models import (
-    Distance,
-    VectorParams,
-    PointStruct
-)
+    import os
+    import pandas as pd
+    import cohere
 
-load_dotenv()
-
-print("STARTING SCRIPT")
-
-co = cohere.Client(
-    os.getenv("COHERE_API_KEY")
-)
-
-EXCEL_FILE = r"C:\Users\prata\OneDrive\Desktop\project folder\Retail Sales Analytics Assistant\data\Retail_Sales_Text2SQL_MVP.xlsx"
-
-client = QdrantClient(
-    path="./qdrant_db"
-)
-
-COLLECTION_NAME = "retail_metadata"
-
-# Delete old collection if exists
-try:
-    client.delete_collection(COLLECTION_NAME)
-    print("Old collection deleted")
-except:
-    print("No previous collection found")
-
-# Create new collection
-client.create_collection(
-    collection_name=COLLECTION_NAME,
-    vectors_config=VectorParams(
-        size=1024,
-        distance=Distance.COSINE
+    from dotenv import load_dotenv
+    from qdrant_client import QdrantClient
+    from qdrant_client.models import (
+        Distance,
+        VectorParams,
+        PointStruct
     )
-)
 
-print("Collection Created")
+    load_dotenv()
 
-metadata_df = pd.read_excel(
-    EXCEL_FILE,
-    sheet_name="Metadata"
-)
+    try:
+        import streamlit as st
+        api_key = st.secrets["COHERE_API_KEY"]
+    except:
+        api_key = os.getenv("COHERE_API_KEY")
 
-relationships_df = pd.read_excel(
-    EXCEL_FILE,
-    sheet_name="Relationships"
-)
+    co = cohere.Client(api_key)
 
-print("Metadata Rows:", len(metadata_df))
-print("Relationship Rows:", len(relationships_df))
+    EXCEL_FILE = "data/Retail_Sales_Text2SQL_MVP.xlsx"
 
-points = []
-point_id = 0
+    client = QdrantClient(
+        path="./qdrant_db"
+    )
 
-# Metadata
-for _, row in metadata_df.iterrows():
+    COLLECTION_NAME = "retail_metadata"
 
-    document = f"""
+    try:
+        client.delete_collection(COLLECTION_NAME)
+    except:
+        pass
+
+    client.create_collection(
+        collection_name=COLLECTION_NAME,
+        vectors_config=VectorParams(
+            size=1024,
+            distance=Distance.COSINE
+        )
+    )
+
+    metadata_df = pd.read_excel(
+        EXCEL_FILE,
+        sheet_name="Metadata"
+    )
+
+    relationships_df = pd.read_excel(
+        EXCEL_FILE,
+        sheet_name="Relationships"
+    )
+
+    points = []
+
+    point_id = 0
+
+    for _, row in metadata_df.iterrows():
+
+        document = f"""
 Table: {row['table_name']}
 Column: {row['column_name']}
 Description: {row['description']}
 Keywords: {row['keywords']}
 """
 
-    response = co.embed(
-        texts=[document],
-        model="embed-english-v3.0",
-        input_type="search_document"
-    )
-
-    embedding = response.embeddings[0]
-
-    points.append(
-        PointStruct(
-            id=point_id,
-            vector=embedding,
-            payload={
-                "document": document,
-                "type": "metadata"
-            }
+        response = co.embed(
+            texts=[document],
+            model="embed-english-v3.0",
+            input_type="search_document"
         )
-    )
 
-    point_id += 1
+        embedding = response.embeddings[0]
 
-# Relationships
-for _, row in relationships_df.iterrows():
+        points.append(
+            PointStruct(
+                id=point_id,
+                vector=embedding,
+                payload={
+                    "document": document
+                }
+            )
+        )
 
-    document = f"""
+        point_id += 1
+
+    for _, row in relationships_df.iterrows():
+
+        document = f"""
 Relationship:
 {row['source_table']}.{row['source_column']}
 joins
 {row['target_table']}.{row['target_column']}
-type:
-{row['relationship']}
 """
 
-    response = co.embed(
-        texts=[document],
-        model="embed-english-v3.0",
-        input_type="search_document"
-    )
-
-    embedding = response.embeddings[0]
-
-    points.append(
-        PointStruct(
-            id=point_id,
-            vector=embedding,
-            payload={
-                "document": document,
-                "type": "relationship"
-            }
+        response = co.embed(
+            texts=[document],
+            model="embed-english-v3.0",
+            input_type="search_document"
         )
+
+        embedding = response.embeddings[0]
+
+        points.append(
+            PointStruct(
+                id=point_id,
+                vector=embedding,
+                payload={
+                    "document": document
+                }
+            )
+        )
+
+        point_id += 1
+
+    client.upsert(
+        collection_name=COLLECTION_NAME,
+        points=points
     )
 
-    point_id += 1
+    print("Vector Store Created")
 
-client.upsert(
-    collection_name=COLLECTION_NAME,
-    points=points
-)
+    client.close()
 
-print("Documents Uploaded:", len(points))
-print("DONE")
+
+if __name__ == "__main__":
+    build_vector_store()
