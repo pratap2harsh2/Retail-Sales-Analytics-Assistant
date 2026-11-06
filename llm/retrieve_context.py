@@ -3,7 +3,7 @@ import cohere
 
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
-from cohere_client import co
+from llm.cohere_client import co
 load_dotenv()
 
 
