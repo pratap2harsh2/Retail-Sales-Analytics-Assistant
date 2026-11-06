@@ -1,5 +1,5 @@
 def build_vector_store():
-
+    print("Building Vector Store...")
     import os
     import pandas as pd
     import cohere
@@ -124,6 +124,7 @@ joins
 
     client.close()
 
+print("Vector Store Created")
 
 if __name__ == "__main__":
     build_vector_store()
