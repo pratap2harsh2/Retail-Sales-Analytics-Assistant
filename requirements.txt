@@ -1,0 +1,11 @@
+pandas
+openpyxl
+sqlalchemy
+fastapi
+uvicorn
+cohere
+python-dotenv
+pydantic
+python-multipart
+streamlit
+qdrant-client
