@@ -122,9 +122,6 @@ joins
 
     print("Vector Store Created")
 
-    client.close()
-
-print("Vector Store Created")
-
+   
 if __name__ == "__main__":
     build_vector_store()

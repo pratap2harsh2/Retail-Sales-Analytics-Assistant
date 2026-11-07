@@ -1,21 +1,17 @@
-import os
-import cohere
-
 from dotenv import load_dotenv
 from qdrant_client import QdrantClient
 from llm.cohere_client import co
+
 load_dotenv()
-
-
-
-client = QdrantClient(
-    path="./qdrant_db"
-)
 
 COLLECTION_NAME = "retail_metadata"
 
 
 def get_context(question):
+
+    client = QdrantClient(
+        path="./qdrant_db"
+    )
 
     response = co.embed(
         texts=[question],
@@ -37,7 +33,5 @@ def get_context(question):
         documents.append(
             point.payload["document"]
         )
-
-    client.close()
 
     return "\n\n".join(documents)
