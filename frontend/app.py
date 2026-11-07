@@ -29,8 +29,8 @@ from services.sql_executor import execute_sql
 from pathlib import Path
 import traceback
 
-BASE_DIR = Path(__file__).resolve().parent
-QDRANT_PATH = BASE_DIR / "qdrant_db"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+QDRANT_PATH = ROOT_DIR / "qdrant_db"
 
 if not QDRANT_PATH.exists():
     try:
