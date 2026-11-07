@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
-from qdrant_client import QdrantClient
+
 from llm.cohere_client import co
+from vector_store.qdrant_manager import get_qdrant_client
 
 load_dotenv()
 
@@ -9,9 +10,7 @@ COLLECTION_NAME = "retail_metadata"
 
 def get_context(question):
 
-    client = QdrantClient(
-        path="./qdrant_db"
-    )
+    client = get_qdrant_client()
 
     response = co.embed(
         texts=[question],

@@ -3,7 +3,6 @@ from pathlib import Path
 import traceback
 
 import streamlit as st
-from qdrant_client import QdrantClient
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
@@ -18,9 +17,9 @@ from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
 
 
-# ---------------------------------------------------
-# PAGE CONFIG
-# ---------------------------------------------------
+# ---------------------------
+# Page Config
+# ---------------------------
 
 st.set_page_config(
     page_title="Retail Analytics Assistant",
@@ -31,46 +30,18 @@ st.set_page_config(
 st.title("📊 Retail Analytics Assistant")
 
 
-# ---------------------------------------------------
-# QDRANT INITIALIZATION
-# ---------------------------------------------------
-
-COLLECTION_NAME = "retail_metadata"
+# ---------------------------
+# Build Vector Store Once
+# ---------------------------
 
 try:
 
-    client = QdrantClient(
-        path="./qdrant_db"
-    )
-
-    collections = client.get_collections()
-
-    collection_names = [
-        c.name
-        for c in collections.collections
-    ]
-
-    st.sidebar.write(
-        "Collections:",
-        collection_names
-    )
-
-    if COLLECTION_NAME not in collection_names:
-
-        st.info(
-            "Collection not found. Building Vector Store..."
-        )
-
-        build_vector_store()
-
-        st.success(
-            "Vector Store Created Successfully!"
-        )
+    build_vector_store()
 
 except Exception as e:
 
     st.error(
-        f"Vector DB initialization failed: {e}"
+        f"Vector Store Initialization Failed: {e}"
     )
 
     st.code(
@@ -78,9 +49,9 @@ except Exception as e:
     )
 
 
-# ---------------------------------------------------
-# USER INPUT
-# ---------------------------------------------------
+# ---------------------------
+# Question Input
+# ---------------------------
 
 question = st.text_input(
     "Ask a Question",
@@ -88,9 +59,9 @@ question = st.text_input(
 )
 
 
-# ---------------------------------------------------
-# QUERY EXECUTION
-# ---------------------------------------------------
+# ---------------------------
+# Query Execution
+# ---------------------------
 
 if st.button("Generate Answer"):
 
@@ -111,7 +82,9 @@ if st.button("Generate Answer"):
                     context
                 )
 
-                validate_sql(sql)
+                validate_sql(
+                    sql
+                )
 
                 result_df = execute_sql(
                     sql
@@ -155,9 +128,7 @@ if st.button("Generate Answer"):
 
         except Exception as e:
 
-            st.error(
-                f"Error: {str(e)}"
-            )
+            st.error(str(e))
 
             st.code(
                 traceback.format_exc()

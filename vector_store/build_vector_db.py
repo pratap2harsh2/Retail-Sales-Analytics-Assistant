@@ -1,39 +1,50 @@
-def build_vector_store():
-    print("Building Vector Store...")
-    import os
-    import pandas as pd
-    import cohere
+import os
+import pandas as pd
+import cohere
 
-    from dotenv import load_dotenv
-    from qdrant_client import QdrantClient
-    from qdrant_client.models import (
-        Distance,
-        VectorParams,
-        PointStruct
-    )
+from dotenv import load_dotenv
+from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct
+)
+
+from vector_store.qdrant_manager import get_qdrant_client
+
+
+def build_vector_store():
+
+    print("Building Vector Store...")
 
     load_dotenv()
 
     try:
         import streamlit as st
         api_key = st.secrets["COHERE_API_KEY"]
-    except:
+    except Exception:
         api_key = os.getenv("COHERE_API_KEY")
 
     co = cohere.Client(api_key)
 
-    EXCEL_FILE = "data/Retail_Sales_Text2SQL_MVP.xlsx"
-
-    client = QdrantClient(
-        path="./qdrant_db"
-    )
+    client = get_qdrant_client()
 
     COLLECTION_NAME = "retail_metadata"
 
-    try:
-        client.delete_collection(COLLECTION_NAME)
-    except:
-        pass
+    collections = client.get_collections()
+
+    collection_names = [
+        c.name
+        for c in collections.collections
+    ]
+
+    # Collection already exists
+    if COLLECTION_NAME in collection_names:
+        print("Collection already exists.")
+        return
+
+    EXCEL_FILE = "data/Retail_Sales_Text2SQL_MVP.xlsx"
+
+    print("Excel exists:", os.path.exists(EXCEL_FILE))
 
     client.create_collection(
         collection_name=COLLECTION_NAME,
@@ -42,6 +53,8 @@ def build_vector_store():
             distance=Distance.COSINE
         )
     )
+
+    print("Collection created.")
 
     metadata_df = pd.read_excel(
         EXCEL_FILE,
@@ -54,9 +67,9 @@ def build_vector_store():
     )
 
     points = []
-
     point_id = 0
 
+    # Metadata embeddings
     for _, row in metadata_df.iterrows():
 
         document = f"""
@@ -86,6 +99,7 @@ Keywords: {row['keywords']}
 
         point_id += 1
 
+    # Relationship embeddings
     for _, row in relationships_df.iterrows():
 
         document = f"""
@@ -120,8 +134,17 @@ joins
         points=points
     )
 
-    print("Vector Store Created")
+    print(f"Inserted {len(points)} vectors")
 
-   
+    collections = client.get_collections()
+
+    print(
+        "Collections:",
+        [c.name for c in collections.collections]
+    )
+
+    print("Vector Store Created Successfully")
+
+
 if __name__ == "__main__":
     build_vector_store()
