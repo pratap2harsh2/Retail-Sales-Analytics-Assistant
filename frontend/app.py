@@ -9,9 +9,9 @@ sys.path.append(str(ROOT_DIR))
 
 from vector_store.build_vector_db import build_vector_store
 
-from llm.retrieve_context import get_context
-from llm.generate_sql import generate_sql
-from llm.generate_answer import generate_answer
+from src.services.llm.retrieve_context import get_context
+from services.llm.generate_sql import generate_sql
+from services.llm.generate_answer import generate_answer
 
 from services.sql_validator import validate_sql
 from services.sql_executor import execute_sql
