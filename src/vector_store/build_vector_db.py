@@ -9,7 +9,7 @@ from qdrant_client.models import (
     PointStruct
 )
 
-from vector_store.qdrant_manager import get_qdrant_client
+from src.vector_store.qdrant_manager import get_qdrant_client
 
 
 def build_vector_store():

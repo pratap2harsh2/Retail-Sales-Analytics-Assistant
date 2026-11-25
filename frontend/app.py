@@ -7,14 +7,14 @@ import streamlit as st
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
-from vector_store.build_vector_db import build_vector_store
+from src.vector_store.build_vector_db import build_vector_store
 
 from src.services.llm.retrieve_context import get_context
-from services.llm.generate_sql import generate_sql
-from services.llm.generate_answer import generate_answer
+from src.services.llm.generate_sql import generate_sql
+from src.services.llm.generate_answer import generate_answer
 
-from services.sql_validator import validate_sql
-from services.sql_executor import execute_sql
+from src.services.sql_validator import validate_sql
+from src.services.sql_executor import execute_sql
 
 
 # ---------------------------

@@ -3,7 +3,7 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 engine = create_engine(
-    "sqlite:///database/retail.db"
+    "sqlite:///src/database/retail.db"
 )
 def execute_sql(sql):
 

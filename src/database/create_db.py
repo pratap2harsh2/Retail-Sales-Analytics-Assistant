@@ -2,7 +2,7 @@
 import pandas as pd
 from sqlalchemy import create_engine
 
-DB_PATH = "sqlite:///database/retail.db"
+DB_PATH = "sqlite:///src/database/retail.db"
 
 engine = create_engine(DB_PATH)
 

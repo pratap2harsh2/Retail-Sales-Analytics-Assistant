@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
-from llm.cohere_client import co
-from vector_store.qdrant_manager import get_qdrant_client
+from src.services.llm.cohere_client import co
+from src.vector_store.qdrant_manager import get_qdrant_client
 
 load_dotenv()
 

@@ -1,4 +1,4 @@
-from llm.cohere_client import co
+from src.services.llm.cohere_client import co
 def generate_answer(
     question,
     results
