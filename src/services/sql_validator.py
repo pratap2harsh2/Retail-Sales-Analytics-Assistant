@@ -11,6 +11,7 @@ def validate_sql(sql):
 
     query = sql.upper()
 
+
     for keyword in FORBIDDEN:
 
         if keyword in query:

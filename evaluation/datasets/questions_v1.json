@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "category": "basic",
+    "question": "List all stores"
+  },
+  {
+    "id": 2,
+    "category": "basic",
+    "question": "List all products"
+  },
+  {
+    "id": 3,
+    "category": "basic",
+    "question": "Show all regions"
+  },
+  {
+    "id": 4,
+    "category": "basic",
+    "question": "How many customers are there?"
+  },
+  {
+    "id": 5,
+    "category": "filter",
+    "question": "Show stores in South region"
+  },
+  {
+    "id": 6,
+    "category": "filter",
+    "question": "Show Electronics products"
+  },
+  {
+    "id": 7,
+    "category": "aggregation",
+    "question": "Total revenue"
+  },
+  {
+    "id": 8,
+    "category": "aggregation",
+    "question": "Revenue by region"
+  },
+  {
+    "id": 9,
+    "category": "aggregation",
+    "question": "Revenue by category"
+  },
+  {
+    "id": 10,
+    "category": "aggregation",
+    "question": "Total orders"
+  },
+  {
+    "id": 11,
+    "category": "ranking",
+    "question": "Top 5 products by revenue"
+  },
+  {
+    "id": 12,
+    "category": "ranking",
+    "question": "Best performing store"
+  },
+  {
+    "id": 13,
+    "category": "ranking",
+    "question": "Highest revenue region"
+  },
+  {
+    "id": 14,
+    "category": "join",
+    "question": "Revenue by customer segment"
+  },
+  {
+    "id": 15,
+    "category": "join",
+    "question": "Revenue by category"
+  },
+  {
+    "id": 16,
+    "category": "join",
+    "question": "Revenue by store"
+  },
+  {
+    "id": 17,
+    "category": "language_variation",
+    "question": "Sales by region"
+  },
+  {
+    "id": 18,
+    "category": "language_variation",
+    "question": "Turnover by region"
+  },
+  {
+    "id": 19,
+    "category": "language_variation",
+    "question": "Region wise sales performance"
+  },
+  {
+    "id": 20,
+    "category": "language_variation",
+    "question": "Income by region"
+  }
+]

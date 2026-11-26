@@ -1,0 +1,69 @@
+id,category,question,status,rows_returned,generated_sql
+1,basic,List all stores,PASS,8,"SELECT store_name, city, region
+FROM stores;"
+2,basic,List all products,PASS,8,SELECT product_name FROM products;
+3,basic,Show all regions,PASS,4,SELECT DISTINCT region FROM stores;
+4,basic,How many customers are there?,PASS,1,SELECT COUNT(customer_id) FROM customers;
+5,filter,Show stores in South region,PASS,3,SELECT * FROM stores WHERE region = 'South';
+6,filter,Show Electronics products,PASS,4,"SELECT *
+FROM products
+WHERE category = 'Electronics';"
+7,aggregation,Total revenue,PASS,1,"SELECT SUM(sales_amount) AS total_revenue
+FROM orders;"
+8,aggregation,Revenue by region,PASS,4,"SELECT s.region, SUM(o.sales_amount) AS total_revenue
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.region;"
+9,aggregation,Revenue by category,PASS,3,"SELECT p.category, SUM(o.sales_amount) AS total_revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+GROUP BY p.category;"
+10,aggregation,Total orders,PASS,1,"SELECT COUNT(order_id) AS total_orders
+FROM orders;"
+11,ranking,Top 5 products by revenue,PASS,5,"SELECT p.product_name, SUM(o.sales_amount) AS total_revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+GROUP BY p.product_id
+ORDER BY total_revenue DESC
+LIMIT 5;"
+12,ranking,Best performing store,PASS,1,"SELECT s.store_name, SUM(o.quantity) AS total_quantity_sold
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.store_id
+ORDER BY total_quantity_sold DESC
+LIMIT 1;"
+13,ranking,Highest revenue region,PASS,1,"SELECT s.region, SUM(o.sales_amount) AS total_revenue
+FROM orders o
+JOIN stores s ON o.store_id = s.store_id
+GROUP BY s.region
+ORDER BY total_revenue DESC
+LIMIT 1;"
+14,join,Revenue by customer segment,PASS,3,"SELECT c.customer_segment, SUM(o.sales_amount) AS total_revenue
+FROM customers c
+JOIN orders o ON c.customer_id = o.customer_id
+GROUP BY c.customer_segment;"
+15,join,Revenue by category,PASS,3,"SELECT p.category, SUM(o.sales_amount) AS total_revenue
+FROM orders o
+JOIN products p ON o.product_id = p.product_id
+GROUP BY p.category;"
+16,join,Revenue by store,PASS,8,"SELECT s.store_name, SUM(o.sales_amount) AS total_revenue
+FROM orders o
+JOIN stores s ON o.store_id = s.store_id
+GROUP BY s.store_name;"
+17,language_variation,Sales by region,PASS,4,"SELECT s.region, SUM(o.sales_amount) AS total_sales
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.region;"
+18,language_variation,Turnover by region,PASS,4,"SELECT s.region, SUM(o.sales_amount) AS total_turnover
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.region;"
+19,language_variation,Region wise sales performance,PASS,4,"SELECT s.region, SUM(o.sales_amount) AS total_sales
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.region
+ORDER BY total_sales DESC;"
+20,language_variation,Income by region,PASS,4,"SELECT s.region, SUM(o.sales_amount) AS total_income
+FROM stores s
+JOIN orders o ON s.store_id = o.store_id
+GROUP BY s.region;"
